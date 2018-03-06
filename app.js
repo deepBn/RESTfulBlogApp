@@ -39,6 +39,7 @@ var Blog = mongoose.model("Blog", blogSchema);
 
 //RESTFUL ROUTES
 
+//INDEX ROUTE
 app.get("/", function (req, res) {
     res.redirect("/blogs");
 });
@@ -51,6 +52,23 @@ app.get("/blogs", function (req, res) {
             res.render("index", {
                 blogs: blogs
             });
+        }
+    });
+});
+
+//NEW ROUTE
+app.get("/blogs/new", function(req, res) {
+    res.render("new");
+});
+
+//CREATE ROUTE
+app.post("/blogs", function(req, res) {
+    Blog.create(req.body.blog, function(err, blog) {
+        if(err) {
+            console.log(err);
+            res.render("new");
+        } else {
+            res.redirect("/blogs");
         }
     });
 });
