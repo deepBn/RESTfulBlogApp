@@ -2,12 +2,14 @@ var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
+var methodOverride = require("method-override");
 
 //APP CONFIG
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(express.static("public"));
+app.use(methodOverride("_method"));
 app.set("view engine", "ejs");
 
 //MONGOOSE/MODEL CONFIG
@@ -57,16 +59,64 @@ app.get("/blogs", function (req, res) {
 });
 
 //NEW ROUTE
-app.get("/blogs/new", function(req, res) {
+app.get("/blogs/new", function (req, res) {
     res.render("new");
 });
 
 //CREATE ROUTE
-app.post("/blogs", function(req, res) {
-    Blog.create(req.body.blog, function(err, blog) {
-        if(err) {
+app.post("/blogs", function (req, res) {
+    Blog.create(req.body.blog, function (err, blog) {
+        if (err) {
             console.log(err);
             res.render("new");
+        } else {
+            res.redirect("/blogs");
+        }
+    });
+});
+
+//SHOW ROUTE
+app.get("/blogs/:id", function (req, res) {
+    Blog.findById(req.params.id, function (err, blog) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.render("show", {
+                blog: blog
+            });
+        }
+    });
+});
+
+//EDIT ROUTE
+app.get("/blogs/:id/edit", function (req, res) {
+    Blog.findById(req.params.id, function (err, blog) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.render("edit", {
+                blog: blog
+            });
+        }
+    });
+});
+
+//UPDATE ROUTE
+app.put("/blogs/:id", function (req, res) {
+    Blog.findByIdAndUpdate(req.params.id, req.body.blog, function (err, blog) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.redirect("/blogs/" + req.params.id);
+        }
+    });
+});
+
+//DELETE ROUTE
+app.delete("/blogs/:id", function (req, res) {
+    Blog.findByIdAndRemove(req.params.id, function (err) {
+        if (err) {
+            console.log(err);
         } else {
             res.redirect("/blogs");
         }
